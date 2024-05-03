@@ -3,6 +3,8 @@
 #include "opencv2/imgproc.hpp"
 #include "opencv2/videoio.hpp"
 #include <iostream>
+#include <ctime>
+#include <stdio.h>
 
 using namespace std;
 using namespace cv;
@@ -11,8 +13,13 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool try
 
 string cascadeName;
 
+
+std::clock_t tempo_inicio;
+double duracao_tempo;
+
 int main( int argc, const char** argv )
 {
+    tempo_inicio = std::clock();
     VideoCapture capture;
     Mat frame;
     bool tryflip;
@@ -115,13 +122,14 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool try
     t = (double)getTickCount() - t;
     printf( "detection time = %g ms\n", t*1000/getTickFrequency());
     
+    /*
     // Desenha uma imagem
     static int px = 1;
     Mat orange = cv::imread("orange.png", IMREAD_UNCHANGED);
     Rect orangeRect = cv::Rect(px,150,orange.cols, orange.rows);
     drawTransparency(smallImg, orange, px++, 150);
     printf("orang::width: %d, height=%d\n", orange.cols, orange.rows );
-    
+    */
     //desenha o flappy
     Mat flappy = cv::imread("flappy.png", IMREAD_UNCHANGED);
     Rect flappyRect = cv::Rect(1,1,flappy.cols, flappy.rows);
@@ -130,15 +138,24 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool try
     // PERCORRE AS FACES ENCONTRADAS
     for ( size_t i = 0; i < faces.size(); i++ )
     {
+        duracao_tempo = ( std::clock() - tempo_inicio ) / (double) CLOCKS_PER_SEC;
         Rect r = faces[i];
+        //colisao
+        /*
         if((r & orangeRect).area() > 10)
             color = Scalar(255,0,200);
         else
             color = Scalar(255,0,0);
+        */
 
-        if(r.x + flappy.cols < (smallImg.cols+50) && r.y + flappy.rows < (smallImg.rows+50)){
+        if(r.x + flappy.cols < (50 + smallImg.cols) && r.y + flappy.rows < (50 + smallImg.rows) &&  r.x > 50 && r.y > 50){
             drawTransparency(smallImg, flappy, cvRound(r.x - 50),cvRound(r.y - 50));
 
+            flappyRect = cv::Rect(r.x - 50,r.y - 50,flappy.cols, flappy.rows);
+            
+            rectangle( smallImg, Point(flappyRect.x, flappyRect.y),
+                    Point(cvRound((flappyRect.x + flappyRect.width-1)), cvRound((flappyRect.y + flappyRect.height-1))),
+                    color, 3);
 
             rectangle( smallImg, Point(cvRound(r.x), cvRound(r.y)),
                     Point(cvRound((r.x + r.width-1)), cvRound((r.y + r.height-1))),
@@ -146,16 +163,18 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool try
         }
 
     }
-
-
+/*
     // Desenha quadrados com transparencia
     double alpha = 0.3;
     drawTransRect(smallImg, Scalar(0,0,255), alpha, Rect(  0, 0, 200, 200));
     drawTransRect(smallImg, Scalar(255,0,0), alpha, Rect(200, 0, 200, 200));
-
+*/
     // Desenha um texto
     color = Scalar(0,0,255);
-    putText	(smallImg, "Placar:", Point(300, 50), FONT_HERSHEY_PLAIN, 2, color); // fonte
+
+    char a[100];
+    sprintf(a ,"Placar: %.1f",duracao_tempo*100);
+    putText	(smallImg, a, Point(300, 50), FONT_HERSHEY_PLAIN, 2, color); // fonte
 
     // Desenha o frame na tela
     imshow("result", smallImg );
