@@ -27,7 +27,7 @@ int main( int argc, const char** argv )
     double scale;
 
     cascadeName = "haarcascade_frontalface_default.xml";
-    scale = 2; // usar 1, 2, 4.
+    scale = 1; // usar 1, 2, 4.
     if (scale < 1)
         scale = 1;
     tryflip = true;
@@ -133,25 +133,28 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool try
     //desenha o flappy
     Mat flappy = cv::imread("flappy.png", IMREAD_UNCHANGED);
     Rect flappyRect = cv::Rect(1,1,flappy.cols, flappy.rows);
-
     //PRIMEIRO PADRAO DE COLUNAS - VARIAVEIS PARA O PRIMEIRO PADRAO DE COLUNAS
     Mat coluna1 = cv::imread("pipe1.png", IMREAD_UNCHANGED);
     Mat coluna_invertido1 = cv::imread("pipe_invertido1.png", IMREAD_UNCHANGED);
-    static int ix1 = 908, iy1= 0;
-    static int x1 = 908, y1 = 220;
-
+    
+    //*ponto 0,0 da imagem 1.1
+    static int ix1 = smallImg.cols-52, iy1= smallImg.rows-smallImg.rows;
+    //*ponto 0,0 da imagem 1.2
+    static int x1 = smallImg.cols-52, y1 = smallImg.rows-320;
+    
     //CONDICAO PARA O DESLOCAMENTO DAS COLUNAS
     if(x1 <= 15)
     {
-        x1 = 908;
-        ix1 = 908;
+        x1 = smallImg.cols-52;
+        ix1 = smallImg.cols-52;
     }else{
-        x1 -=4;
-        ix1 -=4; 
+        x1 -=10;
+        ix1 -=10; 
     }
+    
     drawTransparency(smallImg, coluna1, x1, y1);
     drawTransparency(smallImg, coluna_invertido1, ix1, iy1);
-
+    
     // PERCORRE AS FACES ENCONTRADAS
     for ( size_t i = 0; i < faces.size(); i++ )
     {
@@ -165,10 +168,10 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool try
             color = Scalar(255,0,0);
         */
 
-        if(r.x + flappy.cols < (50 + smallImg.cols) && r.y + flappy.rows < (50 + smallImg.rows) &&  r.x > 50 && r.y > 50){
-            drawTransparency(smallImg, flappy, cvRound(r.x - 50),cvRound(r.y - 50));
+        if(r.x + flappy.cols < (smallImg.cols) && r.y + flappy.rows < (smallImg.rows) &&  r.x > 0 && r.y > 0){
+            drawTransparency(smallImg, flappy, cvRound(r.x),cvRound(r.y));
 
-            flappyRect = cv::Rect(r.x - 50,r.y - 50,flappy.cols, flappy.rows);
+            flappyRect = cv::Rect(r.x,r.y,flappy.cols, flappy.rows);
             
             rectangle( smallImg, Point(flappyRect.x, flappyRect.y),
                     Point(cvRound((flappyRect.x + flappyRect.width-1)), cvRound((flappyRect.y + flappyRect.height-1))),
@@ -191,7 +194,7 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool try
 
     char a[100];
     sprintf(a ,"Placar: %.1f",duracao_tempo*100);
-    putText	(smallImg, a, Point(300, 50), FONT_HERSHEY_PLAIN, 2, color); // fonte
+    putText	(smallImg, a, Point(smallImg.cols-(smallImg.cols), 25), FONT_HERSHEY_PLAIN, 2, color); // fonte
 
     // Desenha o frame na tela
     imshow("result", smallImg );
