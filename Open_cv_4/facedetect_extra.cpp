@@ -135,26 +135,28 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool try
     Rect flappyRect = cv::Rect(1,1,flappy.cols, flappy.rows);
     //PRIMEIRO PADRAO DE COLUNAS - VARIAVEIS PARA O PRIMEIRO PADRAO DE COLUNAS
     Mat coluna1 = cv::imread("pipe1.png", IMREAD_UNCHANGED);
+    Size colun = coluna1.size();
     Mat coluna_invertido1 = cv::imread("pipe_invertido1.png", IMREAD_UNCHANGED);
+    Size colun2 = coluna_invertido1.size();
     
     //*ponto 0,0 da imagem 1.1
-    static int ix1 = smallImg.cols-52, iy1= smallImg.rows-smallImg.rows;
+    static int ix1 = smallImg.cols-colun.width, iy1= smallImg.rows-smallImg.rows;
     //*ponto 0,0 da imagem 1.2
-    static int x1 = smallImg.cols-52, y1 = smallImg.rows-320;
+    static int x1 = smallImg.cols-colun.width, y1 = smallImg.rows-colun.height;
 
     //*ponto 0,0 da imagem 1.1
-    static int ix2 = smallImg.cols-52, iy2= smallImg.rows-smallImg.rows;
+    static int ix2 = smallImg.cols-colun.width, iy2= smallImg.rows-smallImg.rows;
     //*ponto 0,0 da imagem 1.2
-    static int x2 = smallImg.cols-52, y2 = smallImg.rows-320;
+    static int x2 = smallImg.cols-colun.width, y2 = smallImg.rows-colun.height;
     
     //CONDICAO PARA O DESLOCAMENTO DAS COLUNAS
     if(x1 <= 15)
     {
-        x1 = smallImg.cols-52;
-        ix1 = smallImg.cols-52;
+        x1 = smallImg.cols-colun.width;
+        ix1 = smallImg.cols-colun.width;
     }else{
         x1 -=10;
-        ix1 -=10; 
+        ix1 -=10;
     }
     
     drawTransparency(smallImg, coluna1, x1, y1);
@@ -165,14 +167,14 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool try
         drawTransparency(smallImg, coluna1, x2, y2);
         drawTransparency(smallImg, coluna_invertido1, ix2, iy2);
 
-    if(x2 <= 15)
-    {
-        x2 = smallImg.cols-52;
-        ix2 = smallImg.cols-52;
-    }else{
-        x2 -=10;
-        ix2 -=10; 
-    }
+        if(x2 <= 15)
+        {
+            x2 = smallImg.cols-colun.width;
+            ix2 = smallImg.cols-colun.width;
+        }else{
+            x2 -=10;
+            ix2 -=10; 
+        }
 
     }
     
