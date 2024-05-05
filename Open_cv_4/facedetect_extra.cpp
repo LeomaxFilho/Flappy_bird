@@ -6,6 +6,8 @@
 #include <ctime>
 #include <stdio.h>
 
+bool key = false;
+
 using namespace std;
 using namespace cv;
 
@@ -143,12 +145,11 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool try
     static int ix1 = smallImg.cols-colun.width, iy1= smallImg.rows-smallImg.rows;
     //*ponto 0,0 da imagem 1.2
     static int x1 = smallImg.cols-colun.width, y1 = smallImg.rows-colun.height;
-
     //*ponto 0,0 da imagem 1.1
     static int ix2 = smallImg.cols-colun.width, iy2= smallImg.rows-smallImg.rows;
     //*ponto 0,0 da imagem 1.2
     static int x2 = smallImg.cols-colun.width, y2 = smallImg.rows-colun.height;
-    
+
     //CONDICAO PARA O DESLOCAMENTO DAS COLUNAS
     if(x1 <= 15)
     {
@@ -164,6 +165,12 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool try
 
     if (x1 < (smallImg.cols/2) && ix1 < (smallImg.cols/2) )
     {
+        key = true;
+    }
+    printf("colun.width:%d", smallImg.cols-colun.width);
+
+    if (key)
+    {
         drawTransparency(smallImg, coluna1, x2, y2);
         drawTransparency(smallImg, coluna_invertido1, ix2, iy2);
 
@@ -177,8 +184,6 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool try
         }
 
     }
-    
-    
     
     // PERCORRE AS FACES ENCONTRADAS
     for ( size_t i = 0; i < faces.size(); i++ )
