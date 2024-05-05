@@ -125,7 +125,24 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool try
     //desenha o flappy
     Mat flappy = cv::imread("flappy.png", IMREAD_UNCHANGED);
     Rect flappyRect = cv::Rect(1,1,flappy.cols, flappy.rows);
-    
+
+    //PRIMEIRO PADRAO DE COLUNAS - VARIAVEIS PARA O PRIMEIRO PADRAO DE COLUNAS
+    Mat coluna1 = cv::imread("pipe1.png", IMREAD_UNCHANGED);
+    Mat coluna_invertido1 = cv::imread("pipe_invertido1.png", IMREAD_UNCHANGED);
+    static int ix1 = 908, iy1= 0;
+    static int x1 = 908, y1 = 220;
+
+    //CONDICAO PARA O DESLOCAMENTO DAS COLUNAS
+    if(x1 <= 15)
+    {
+        x1 = 908;
+        ix1 = 908;
+    }else{
+        x1 -=4;
+        ix1 -=4; 
+    }
+    drawTransparency(smallImg, coluna1, x1, y1);
+    drawTransparency(smallImg, coluna_invertido1, ix1, iy1);
 
     // PERCORRE AS FACES ENCONTRADAS
     for ( size_t i = 0; i < faces.size(); i++ )
