@@ -156,15 +156,23 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool try
     Mat coluna_invertido1 = cv::imread("pipe_invertido1.png", IMREAD_UNCHANGED);
     Rect coluna_invertido1Rect = cv::Rect(1,1,coluna_invertido1.cols, coluna_invertido1.rows);
     Size colun2 = coluna_invertido1.size();
+
+    Mat coluna2 = cv::imread("pipe2.png", IMREAD_UNCHANGED);
+    Rect coluna2Rect = cv::Rect(1,1,coluna2.cols, coluna2.rows);
+    Size colun3 = coluna2.size();
+
+    Mat coluna_invertido2 = cv::imread("pipe_invertido2.png", IMREAD_UNCHANGED);
+    Rect coluna_invertido2Rect = cv::Rect(1,1,coluna_invertido2.cols, coluna_invertido2.rows);
+    Size colun4 = coluna_invertido2.size();
     
     //*ponto 0,0 da imagem 1.1
     static int ix1 = smallImg.cols-colun.width, iy1= smallImg.rows-smallImg.rows;
     //*ponto 0,0 da imagem 1.2
     static int x1 = smallImg.cols-colun.width, y1 = smallImg.rows-colun.height;
     //*ponto 0,0 da imagem 1.1
-    static int ix2 = smallImg.cols-colun.width, iy2= smallImg.rows-smallImg.rows;
+    static int ix2 = smallImg.cols-colun3.width, iy2= smallImg.rows-smallImg.rows;
     //*ponto 0,0 da imagem 1.2
-    static int x2 = smallImg.cols-colun.width, y2 = smallImg.rows-colun.height;
+    static int x2 = smallImg.cols-colun3.width, y2 = smallImg.rows-colun3.height;
 
     //CONDICAO PARA O DESLOCAMENTO DAS COLUNAS
     if(x1 <= 15)
@@ -172,13 +180,16 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool try
         x1 = smallImg.cols-colun.width;
         ix1 = smallImg.cols-colun.width;
     }else{
-        x1 -=3;
-        ix1 -=3;
+        x1 -=4*log(10+duracao_tempo);
+        ix1 -=4*log(10+duracao_tempo);
     }
     
     //DETERMINAÇÃO DE UM RETANGULO PARA CADA TUBO
     coluna1Rect = cv::Rect(x1,y1,coluna1.cols, coluna1.rows);
     coluna_invertido1Rect = cv::Rect(ix1,iy1,coluna_invertido1.cols, coluna_invertido1.rows);
+
+    coluna2Rect = cv::Rect(x2,y2,coluna2.cols, coluna2.rows);
+    coluna_invertido2Rect = cv::Rect(ix2,iy2,coluna_invertido2.cols, coluna_invertido2.rows);
 
     drawTransparency(smallImg, coluna1, x1, y1);
     drawTransparency(smallImg, coluna_invertido1, ix1, iy1);
@@ -191,16 +202,16 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool try
 
     if (key)
     {
-        drawTransparency(smallImg, coluna1, x2, y2);
-        drawTransparency(smallImg, coluna_invertido1, ix2, iy2);
+        drawTransparency(smallImg, coluna2, x2, y2);
+        drawTransparency(smallImg, coluna_invertido2, ix2, iy2);
 
         if(x2 <= 15)
         {
             x2 = smallImg.cols-colun.width;
             ix2 = smallImg.cols-colun.width;
         }else{
-            x2 -=3;
-            ix2 -=3; 
+            x2 -=4*log(10+duracao_tempo);
+            ix2 -=4*log(10+duracao_tempo)    ; 
         }
 
     }
@@ -227,13 +238,14 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool try
             color = Scalar(255,0,0);
         */
 
-        if(r.x + flappy.cols < (smallImg.cols) && r.y + flappy.rows < (smallImg.rows) &&  r.x > 0 && r.y > 0){
-            drawTransparency(smallImg, flappy, cvRound(r.x),cvRound(r.y));
-
-            flappyRect = cv::Rect(r.x,r.y,flappy.cols, flappy.rows);
+        if(((r.br() + r.tl())*0.46).x + flappy.cols < (smallImg.cols) && ((r.br() + r.tl())*0.46).y + flappy.rows < (smallImg.rows) &&  ((r.br() + r.tl())*0.46).x > 0 && ((r.br() + r.tl())*0.46).y > 0){
+            drawTransparency(smallImg, flappy, cvRound(((r.br() + r.tl())*0.46).x),cvRound(((r.br() + r.tl())*0.46).y));
+            //*((r.br() + r.tl())*0.46).y) = ponto medio R.y
+            //*((r.br() + r.tl())*0.46).x) = ponto medio R.x
+            flappyRect = cv::Rect(((r.br() + r.tl())*0.46).x,((r.br() + r.tl())*0.46).y,flappy.cols, flappy.rows);
 
             //TESTE SE ESTA OCORRENDO A COLISAO ENTRE O PASSARO E O TUBO
-            if((flappyRect & coluna1Rect).area() > 1 || (flappyRect & coluna_invertido1Rect).area() > 1){
+            if(((flappyRect & coluna2Rect).area() > 1 || (flappyRect & coluna_invertido2Rect).area() > 1)|| ((flappyRect & coluna1Rect).area() > 1 || (flappyRect & coluna_invertido1Rect).area() > 1)){
                 color = Scalar(0,200,0);
                 chave = false;
                 key = false;
@@ -245,17 +257,19 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool try
             else{
                 color = Scalar(255,0,0);
             }
-            
+
+           /*
             rectangle( smallImg, Point(flappyRect.x, flappyRect.y),
                     Point(cvRound((flappyRect.x + flappyRect.width-1)), cvRound((flappyRect.y + flappyRect.height-1))),
                     color, 3);
+            */
             /*
             rectangle( smallImg, Point(cvRound(r.x), cvRound(r.y)),
                     Point(cvRound((r.x + r.width-1)), cvRound((r.y + r.height-1))),
                     color, 3);
             */
         }
-
+        /*
         rectangle( smallImg, Point(coluna1Rect.x, coluna1Rect.y),
                     Point(cvRound((coluna1Rect.x + coluna1Rect.width-1)), cvRound((coluna1Rect.y + coluna1Rect.height-1))),
                     color, 3);
@@ -263,6 +277,7 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool try
         rectangle( smallImg, Point(coluna_invertido1Rect.x, coluna_invertido1Rect.y),
                     Point(cvRound((coluna_invertido1Rect.x + coluna_invertido1Rect.width-1)), cvRound((coluna_invertido1Rect.y + coluna_invertido1Rect.height-1))),
                     color, 3);
+        */
 
     }
 /*
