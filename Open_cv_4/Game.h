@@ -1,13 +1,14 @@
 #pragma once
 #include <opencv2/opencv.hpp>
 #include <iostream>
+#include "facedetect_extra.cpp"
 //#include <Flappy.h>
 
 using namespace cv;
 using namespace std;
 
 //Variavel temporaria para manipular a saida da janela de menu
-bool temp;
+bool temp, temp2;
 
 class Game 
 {
@@ -25,6 +26,7 @@ public:
 Game::Game(){
     background = imread("background.png");
     temp = false;
+    temp2 = false;
 }
 
 //FUNCAO PARA DETECTAR OS LOCAIS DOS CLIQUES
@@ -32,8 +34,10 @@ void CallbuttonBack(int event, int x, int y, int flags, void* userdata) {
     
     //Verifica se o botao esquerdo do mouse foi acionado e depois realiza o mapeamento de qual local foi realizado o aperto do botao
     if (event == EVENT_LBUTTONDOWN) {
-        if(x >= 400 && x <= 600 && y >= 250 && y <= 300)
+        if(x >= 400 && x <= 600 && y >= 250 && y <= 300){ 
             cout << "Botão START clicado!" << endl;
+            temp2 = true;
+        }
             // Implemente a ação para iniciar o jogo aqui (por exemplo, abra uma nova janela de jogo)
         if(x >= 400 && x <= 600 && y >= 350 && y <= 400)
             cout << "Botão RECORD clicado!" << endl;
@@ -75,7 +79,10 @@ void Game::run(){
         int key = cv::waitKey(20);
 
         //Condicao para fechamento da janela do menu
-        if (temp == true) break; 
+        if (temp == true || temp2 == true) break; 
+    }
+    if(temp2 == true){
+        b();
     }
 }
 
