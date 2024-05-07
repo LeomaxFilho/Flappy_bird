@@ -59,9 +59,20 @@ int b()
             char c = (char)waitKey(10);
             if( c == 27 || c == 'q' || c == 'Q' )
                 break;
-        } 
-        
+        }
     }
+    if(chave == false){
+        destroyAllWindows();
+        Mat GameOver =  imread("gameover.png");
+        cv::putText(GameOver, "PREES ESC TO LEAVE", cv::Point(320, 360), cv::FONT_HERSHEY_TRIPLEX, 1, cv::Scalar(0 , 215, 255), 2);
+                                                //(blue ,green, red)
+        cv::putText(GameOver, "Placar: " + to_string((int)(duracao_tempo*100)), cv::Point(345, 460), cv::FONT_HERSHEY_TRIPLEX, 1, cv::Scalar(0 , 215, 255), 2);
+        while (1){
+            imshow("GameOver", GameOver);
+            if(waitKey(1) == 27) break;
+        }
+    }
+
     chave = true;
     return 0;
 }
@@ -161,10 +172,11 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool try
         x1 = smallImg.cols-colun.width;
         ix1 = smallImg.cols-colun.width;
     }else{
-        x1 -=10;
-        ix1 -=10;
+        x1 -=3;
+        ix1 -=3;
     }
     
+    //DETERMINAÇÃO DE UM RETANGULO PARA CADA TUBO
     coluna1Rect = cv::Rect(x1,y1,coluna1.cols, coluna1.rows);
     coluna_invertido1Rect = cv::Rect(ix1,iy1,coluna_invertido1.cols, coluna_invertido1.rows);
 
@@ -187,12 +199,12 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool try
             x2 = smallImg.cols-colun.width;
             ix2 = smallImg.cols-colun.width;
         }else{
-            x2 -=10;
-            ix2 -=10; 
+            x2 -=3;
+            ix2 -=3; 
         }
 
     }
-    
+
     // PERCORRE AS FACES ENCONTRADAS
     for ( size_t i = 0; i < faces.size(); i++ )
     {
@@ -220,6 +232,7 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool try
 
             flappyRect = cv::Rect(r.x,r.y,flappy.cols, flappy.rows);
 
+            //TESTE SE ESTA OCORRENDO A COLISAO ENTRE O PASSARO E O TUBO
             if((flappyRect & coluna1Rect).area() > 1 || (flappyRect & coluna_invertido1Rect).area() > 1){
                 color = Scalar(0,200,0);
                 chave = false;
