@@ -1,17 +1,17 @@
 #pragma once
 #include <opencv2/opencv.hpp>
 #include <iostream>
-#include "facedetect_extra.cpp"
-//#include <Flappy.h>
+//#include "facedetect_extra.cpp"
+#include "Flappy.h"
 #include <unistd.h>
 
 using namespace cv;
 using namespace std;
 
 //Variavel temporaria para manipular a saida da janela de menu
-bool temp, temp2;
+bool temp, temp2, temp3;
 
-class Game 
+class Game : public Flappy
 {
 private:
     //Variavel da classe responsavel pela criacao da janela    
@@ -28,6 +28,7 @@ Game::Game(){
     background = imread("background.png");
     temp = false;
     temp2 = false;
+    temp3 = false;
 }
 
 //FUNCAO PARA DETECTAR OS LOCAIS DOS CLIQUES
@@ -40,8 +41,10 @@ void CallbuttonBack(int event, int x, int y, int flags, void* userdata) {
             temp2 = true;
         }
             // Implemente a ação para iniciar o jogo aqui (por exemplo, abra uma nova janela de jogo)
-        if(x >= 400 && x <= 600 && y >= 350 && y <= 400)
+        if(x >= 400 && x <= 600 && y >= 350 && y <= 400){ 
             cout << "Botão RECORD clicado!" << endl;
+            temp3 = true;
+        }
         if(x >= 400 && x <= 600 && y >= 450 && y <= 500){ 
             cout << "Botão EXIT clicado!" << endl;
             temp = true;
@@ -56,7 +59,6 @@ void Game::run(){
         cout << "Erro ao abrir a imagem\n";
         return; //-> Encerra o programa caso nao ocorra a abertura da imagem de forma correta
     }
-
 
     cv::putText(background, "FLAPPY BIRD", cv::Point(275, 155), cv::FONT_HERSHEY_TRIPLEX, 2, cv::Scalar(0, 0, 0), 2);
 
@@ -86,9 +88,15 @@ void Game::run(){
         }
         if(temp2 == true){
             destroyAllWindows();
-            b();
+            FlappyGame();
             destroyAllWindows();
             temp2 = false;
+        }
+        if(temp3 == true){
+            destroyAllWindows();
+            record();
+            destroyAllWindows();  
+            temp3 = false;
         }
     }
 }

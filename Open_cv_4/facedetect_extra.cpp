@@ -5,6 +5,8 @@
 #include <iostream>
 #include <ctime>
 #include <stdio.h>
+#include <fstream>
+
 bool chave = true;
 bool key = false;
 
@@ -15,12 +17,77 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool try
 
 string cascadeName;
 
+void salvarScore(int pontuacao){
 
-std::clock_t tempo_inicio;
+    fstream score;
+    int record;
+
+    //Abrindo primeiramento o arquivo para leitura
+    score.open("Record.txt", ios::in);
+
+    if(!score.is_open()){
+        cout << "ERRO AO ABRIR O ARQUIVO\n";
+        return;
+    }
+
+    //RECEBE O DADO ARMAZENA NO ARQUIVO PARA VERIFICAR COM A PONTUACAO ATUAL
+    score >> record;
+
+    if(record < pontuacao){
+        score.close();
+        score.open("Record.txt", ios::out);
+        if(!score.is_open()){
+        cout << "ERRO AO ABRIR O ARQUIVO\n";
+            return;
+        } 
+        score << pontuacao << endl;  
+
+        score.close();
+    }
+}
+
+int resgataScore(){
+    ifstream score;
+    int record;
+
+    score.open("Record.txt");
+    
+    if(!score.is_open()){
+        cout << "ERRO AO ABRIR O ARQUIVO SCORE\n";
+        return 0;
+    }
+
+    score >> record; 
+    return record;
+}
+
+void record(){
+    int score;
+    Mat tela;
+
+    //INICIALIZANDO OUTRA IMAGEM PARA O RECORDS
+    tela = imread("background.png");
+
+    score = resgataScore();
+    
+    cv::putText(tela, "FLAPPY BIRD", cv::Point(275, 155), cv::FONT_HERSHEY_TRIPLEX, 2, cv::Scalar(0, 0, 0), 2);
+
+    //COLOCANDO NA TELA O RECORD
+    putText(tela, "RECORD: " + to_string(score), cv::Point(400, 250), FONT_HERSHEY_TRIPLEX, 1, cv::Scalar(0, 0, 0), 2);
+
+    putText(tela, "PREES ESC TO LEAVE ", cv::Point(330, 300), FONT_HERSHEY_TRIPLEX, 1, cv::Scalar(0, 0, 0), 2);
+    
+    while(1){
+        imshow("Record", tela);
+        if(waitKey(1) == 27) break;
+    }
+}
+
+clock_t tempo_inicio;
 double duracao_tempo;
 
-int b()
-{
+int Flappy(){ 
+    
     tempo_inicio = std::clock();
     VideoCapture capture;
     Mat frame;
@@ -65,8 +132,12 @@ int b()
         destroyAllWindows();
         Mat GameOver =  imread("gameover.png");
         cv::putText(GameOver, "PREES ESC TO LEAVE", cv::Point(320, 360), cv::FONT_HERSHEY_TRIPLEX, 1, cv::Scalar(0 , 215, 255), 2);
-                                                //(blue ,green, red)
-        cv::putText(GameOver, "Placar: " + to_string((int)(duracao_tempo*100)), cv::Point(345, 460), cv::FONT_HERSHEY_TRIPLEX, 1, cv::Scalar(0 , 215, 255), 2);
+        
+        cv::putText(GameOver, "SCORE: " + to_string((int)(duracao_tempo*100)), Point(400, 400), cv::FONT_HERSHEY_TRIPLEX, 1, cv::Scalar(0 , 215, 255), 2);
+
+        //Mandando o score para comparar com o armazenado e fazer o salvamento
+        salvarScore((int)(duracao_tempo*100));
+
         while (1){
             imshow("GameOver", GameOver);
             if(waitKey(1) == 27) break;
@@ -77,7 +148,7 @@ int b()
     return 0;
 }
 
-/**
+/*
  * @brief Draws a transparent image over a frame Mat.
  * 
  * @param frame the frame where the transparent image will be drawn
@@ -85,6 +156,8 @@ int b()
  * @param xPos x position of the frame image where the image will start.
  * @param yPos y position of the frame image where the image will start.
  */
+
+
 void drawTransparency(Mat frame, Mat transp, int xPos, int yPos) {
     Mat mask;
     vector<Mat> layers;
@@ -240,6 +313,7 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool try
 
         if(((r.br() + r.tl())*0.46).x + flappy.cols < (smallImg.cols) && ((r.br() + r.tl())*0.46).y + flappy.rows < (smallImg.rows) &&  ((r.br() + r.tl())*0.46).x > 0 && ((r.br() + r.tl())*0.46).y > 0){
             drawTransparency(smallImg, flappy, cvRound(((r.br() + r.tl())*0.46).x),cvRound(((r.br() + r.tl())*0.46).y));
+
             //*((r.br() + r.tl())*0.46).y) = ponto medio R.y
             //*((r.br() + r.tl())*0.46).x) = ponto medio R.x
             flappyRect = cv::Rect(((r.br() + r.tl())*0.46).x,((r.br() + r.tl())*0.46).y,flappy.cols, flappy.rows);
@@ -287,10 +361,10 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool try
     drawTransRect(smallImg, Scalar(255,0,0), alpha, Rect(200, 0, 200, 200));
 */
     // Desenha um texto
-    color = Scalar(0,0,255);
+    color = Scalar(255,255,255);
 
     char a[100];
-    sprintf(a ,"Placar: %.1f",duracao_tempo*100);
+    sprintf(a ,"SCORE: %.1f",duracao_tempo*100);
     putText	(smallImg, a, Point(smallImg.cols-(smallImg.cols), 25), FONT_HERSHEY_PLAIN, 2, color); // fonte
 
     // Desenha o frame na tela
