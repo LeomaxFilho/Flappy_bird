@@ -3,6 +3,7 @@
 #include <iostream>
 #include "facedetect_extra.cpp"
 //#include <Flappy.h>
+#include <unistd.h>
 
 using namespace cv;
 using namespace std;
@@ -79,10 +80,16 @@ void Game::run(){
         int key = cv::waitKey(20);
 
         //Condicao para fechamento da janela do menu
-        if (temp == true || temp2 == true) break; 
-    }
-    if(temp2 == true){
-        b();
+        if (temp == true ) { 
+            destroyAllWindows();
+            break; 
+        }
+        if(temp2 == true){
+            destroyAllWindows();
+            b();
+            destroyAllWindows();
+            temp2 = false;
+        }
     }
 }
 

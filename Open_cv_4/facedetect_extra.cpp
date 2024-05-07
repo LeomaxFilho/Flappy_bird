@@ -19,7 +19,7 @@ string cascadeName;
 std::clock_t tempo_inicio;
 double duracao_tempo;
 
-int main( int argc, const char** argv )
+int b()
 {
     tempo_inicio = std::clock();
     VideoCapture capture;
