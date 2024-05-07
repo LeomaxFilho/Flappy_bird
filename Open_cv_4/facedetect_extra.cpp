@@ -5,7 +5,7 @@
 #include <iostream>
 #include <ctime>
 #include <stdio.h>
-
+bool chave = true;
 bool key = false;
 
 using namespace std;
@@ -48,21 +48,21 @@ int b()
 
     if( capture.isOpened() ) {
         cout << "Video capturing has been started ..." << endl;
-
-        while (1)
+        while (chave)
         {
             capture >> frame;
             if( frame.empty() )
                 break;
-
+            
             detectAndDraw( frame, cascade, scale, tryflip );
 
             char c = (char)waitKey(10);
             if( c == 27 || c == 'q' || c == 'Q' )
                 break;
-        }
+        } 
+        
     }
-
+    chave = true;
     return 0;
 }
 
@@ -132,13 +132,18 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool try
     drawTransparency(smallImg, orange, px++, 150);
     printf("orang::width: %d, height=%d\n", orange.cols, orange.rows );
     */
+   
     //desenha o flappy
     Mat flappy = cv::imread("flappy.png", IMREAD_UNCHANGED);
     Rect flappyRect = cv::Rect(1,1,flappy.cols, flappy.rows);
+
     //PRIMEIRO PADRAO DE COLUNAS - VARIAVEIS PARA O PRIMEIRO PADRAO DE COLUNAS
     Mat coluna1 = cv::imread("pipe1.png", IMREAD_UNCHANGED);
+    Rect coluna1Rect = cv::Rect(1,1,coluna1.cols, coluna1.rows);
     Size colun = coluna1.size();
+
     Mat coluna_invertido1 = cv::imread("pipe_invertido1.png", IMREAD_UNCHANGED);
+    Rect coluna_invertido1Rect = cv::Rect(1,1,coluna_invertido1.cols, coluna_invertido1.rows);
     Size colun2 = coluna_invertido1.size();
     
     //*ponto 0,0 da imagem 1.1
@@ -160,6 +165,9 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool try
         ix1 -=10;
     }
     
+    coluna1Rect = cv::Rect(x1,y1,coluna1.cols, coluna1.rows);
+    coluna_invertido1Rect = cv::Rect(ix1,iy1,coluna_invertido1.cols, coluna_invertido1.rows);
+
     drawTransparency(smallImg, coluna1, x1, y1);
     drawTransparency(smallImg, coluna_invertido1, ix1, iy1);
 
@@ -198,19 +206,50 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool try
             color = Scalar(255,0,0);
         */
 
+       /*
+       cv::intersects(&flappyRect, &coluna1Rect);
+       if((flappyRect & coluna1Rect).area() > 1 || (flappyRect & coluna_invertido1Rect).area() > 1){
+            color = Scalar(0,200,0);
+        }
+        else
+            color = Scalar(255,0,0);
+        */
+
         if(r.x + flappy.cols < (smallImg.cols) && r.y + flappy.rows < (smallImg.rows) &&  r.x > 0 && r.y > 0){
             drawTransparency(smallImg, flappy, cvRound(r.x),cvRound(r.y));
 
             flappyRect = cv::Rect(r.x,r.y,flappy.cols, flappy.rows);
+
+            if((flappyRect & coluna1Rect).area() > 1 || (flappyRect & coluna_invertido1Rect).area() > 1){
+                color = Scalar(0,200,0);
+                chave = false;
+                key = false;
+                x1 = smallImg.cols-colun.width;
+                ix1 = smallImg.cols-colun.width;
+                x2 = smallImg.cols-colun.width;
+                ix2 = smallImg.cols-colun.width;
+            }
+            else{
+                color = Scalar(255,0,0);
+            }
             
             rectangle( smallImg, Point(flappyRect.x, flappyRect.y),
                     Point(cvRound((flappyRect.x + flappyRect.width-1)), cvRound((flappyRect.y + flappyRect.height-1))),
                     color, 3);
-
+            /*
             rectangle( smallImg, Point(cvRound(r.x), cvRound(r.y)),
                     Point(cvRound((r.x + r.width-1)), cvRound((r.y + r.height-1))),
                     color, 3);
+            */
         }
+
+        rectangle( smallImg, Point(coluna1Rect.x, coluna1Rect.y),
+                    Point(cvRound((coluna1Rect.x + coluna1Rect.width-1)), cvRound((coluna1Rect.y + coluna1Rect.height-1))),
+                    color, 3);
+
+        rectangle( smallImg, Point(coluna_invertido1Rect.x, coluna_invertido1Rect.y),
+                    Point(cvRound((coluna_invertido1Rect.x + coluna_invertido1Rect.width-1)), cvRound((coluna_invertido1Rect.y + coluna_invertido1Rect.height-1))),
+                    color, 3);
 
     }
 /*
