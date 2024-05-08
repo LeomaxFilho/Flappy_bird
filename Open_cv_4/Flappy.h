@@ -10,6 +10,7 @@
 
 using namespace std;
 using namespace cv;
+int counter;
 
 class Flappy
 {
@@ -152,7 +153,14 @@ void Flappy::detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, 
                 ix2 = smallImg.cols-colun.width;
             }
             else{
-                color = Scalar(255,0,0);
+            counter++;
+            if (counter > 50)
+            {
+                //chave = false;
+                cerr << "Rosto nao identificado";
+                cv::putText(smallImg, "Rosto Fora da Tela", cv::Point(320, 360), cv::FONT_HERSHEY_TRIPLEX, 1, cv::Scalar(0 , 215, 255), 2);
+            }else
+                counter = 0;
             }
         }
     }
