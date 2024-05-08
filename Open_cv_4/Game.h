@@ -73,7 +73,6 @@ void Game::run(){
 
     // Display the menu and manage events
     while (true) {
-
         //Desenha a imagem do menu na tela
         imshow("Menu", background);
 
@@ -82,12 +81,13 @@ void Game::run(){
         int key = cv::waitKey(20);
 
         //Condicao para fechamento da janela do menu
-        if (temp == true ) { 
+        if (temp == true ) {
             destroyAllWindows();
             break; 
         }
         if(temp2 == true){
             destroyAllWindows();
+            system("cvlc &");
             FlappyGame();
             destroyAllWindows();
             temp2 = false;

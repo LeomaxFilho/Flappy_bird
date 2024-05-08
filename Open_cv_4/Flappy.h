@@ -7,6 +7,7 @@
 #include <ctime>
 #include <stdio.h>
 #include <fstream>
+#include <unistd.h>
 
 using namespace std;
 using namespace cv;
@@ -36,7 +37,6 @@ public:
 };
 
 void Flappy::detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, bool tryflip){
-    
     double t = 0;
     vector<Rect> faces;
     Mat gray, smallImg;
@@ -123,7 +123,7 @@ void Flappy::detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, 
             ix2 = smallImg.cols-colun.width;
         }else{
             x2 -=4*log(10+duracao_tempo);
-            ix2 -=4*log(10+duracao_tempo)    ; 
+            ix2 -=4*log(10+duracao_tempo); 
         }
 
     }
@@ -144,13 +144,16 @@ void Flappy::detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, 
 
             //TESTE SE ESTA OCORRENDO A COLISAO ENTRE O PASSARO E O TUBO
             if(((flappyRect & coluna2Rect).area() > 1 || (flappyRect & coluna_invertido2Rect).area() > 1)|| ((flappyRect & coluna1Rect).area() > 1 || (flappyRect & coluna_invertido1Rect).area() > 1)){
-                color = Scalar(0,200,0);
+                system("cvlc --play-and-exit explosao.mp3 &");
+                //sleep(2);
+                //system("cvlc --loop explosao.mp3 &");
                 chave = false;
                 key = false;
                 x1 = smallImg.cols-colun.width;
                 ix1 = smallImg.cols-colun.width;
                 x2 = smallImg.cols-colun.width;
                 ix2 = smallImg.cols-colun.width;
+                //system("cvlc --play-and-exit explosao.mp3 &");
             }
             else{
             counter++;
@@ -235,7 +238,7 @@ void Flappy::record(){
     //COLOCANDO NA TELA O RECORD
     putText(tela, "RECORD: " + to_string(score), cv::Point(400, 250), FONT_HERSHEY_TRIPLEX, 1, cv::Scalar(0, 0, 0), 2);
 
-    putText(tela, "PREES ESC TO LEAVE ", cv::Point(330, 300), FONT_HERSHEY_TRIPLEX, 1, cv::Scalar(0, 0, 0), 2);
+    putText(tela, "PRESS ESC TO LEAVE ", cv::Point(330, 300), FONT_HERSHEY_TRIPLEX, 1, cv::Scalar(0, 0, 0), 2);
     
     while(1){
         imshow("Record", tela);
@@ -288,7 +291,7 @@ int Flappy::FlappyGame(){
     if(chave == false){
         destroyAllWindows();
         Mat GameOver =  imread("gameover.png");
-        cv::putText(GameOver, "PREES ESC TO LEAVE", cv::Point(320, 360), cv::FONT_HERSHEY_TRIPLEX, 1, cv::Scalar(0 , 215, 255), 2);
+        cv::putText(GameOver, "PRESS ESC TO LEAVE", cv::Point(320, 360), cv::FONT_HERSHEY_TRIPLEX, 1, cv::Scalar(0 , 215, 255), 2);
         
         cv::putText(GameOver, "SCORE: " + to_string((int)(duracao_tempo*100)), Point(400, 400), cv::FONT_HERSHEY_TRIPLEX, 1, cv::Scalar(0 , 215, 255), 2);
 
