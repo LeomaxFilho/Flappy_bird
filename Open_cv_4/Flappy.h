@@ -292,6 +292,8 @@ int Flappy::FlappyGame(){
         
         cv::putText(GameOver, "SCORE: " + to_string((int)(duracao_tempo*100)), Point(400, 400), cv::FONT_HERSHEY_TRIPLEX, 1, cv::Scalar(0 , 215, 255), 2);
 
+        cv::putText(GameOver, "BEST SCORE: " + to_string(resgataScore()), Point(360, 440), cv::FONT_HERSHEY_TRIPLEX, 1, cv::Scalar(0 , 215, 255), 2);
+
         //Mandando o score para comparar com o armazenado e fazer o salvamento
         salvarScore((int)(duracao_tempo*100));
 
