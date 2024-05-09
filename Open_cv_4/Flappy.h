@@ -43,7 +43,7 @@ void Flappy::detectAndDraw( Mat& img, CascadeClassifier& cascade, double scale, 
     Scalar color = Scalar(255,0,200);
 
     double fx = 1 / scale;
-    resize( img, smallImg, Size(), fx, fx, INTER_LINEAR_EXACT );
+    resize( img, smallImg, Size(848,480), 1, 1, INTER_LINEAR_EXACT );
     if( tryflip )
         flip(smallImg, smallImg, 1);
     cvtColor( smallImg, gray, COLOR_BGR2GRAY );
